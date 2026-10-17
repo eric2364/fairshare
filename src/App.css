@@ -4,3 +4,56 @@
 @media(max-width:1150px){.sidebar{width:210px;padding:35px 22px}main{margin-left:210px;padding:32px 4%}.group-grid{grid-template-columns:repeat(2,minmax(0,1fr))}h1{font-size:39px}h1 em{font-size:43px}.detail-grid{grid-template-columns:minmax(0,1fr)}.balances{max-width:none}.settings-grid{grid-template-columns:1fr}}
 @media(max-width:700px){.sidebar,.topline{display:none}main{margin:0;padding:20px 22px 110px}.mobile-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}.mobile-header .brand{font-size:23px}.mobile-header .brand-mark{width:32px;height:34px;font-size:30px;border-radius:9px}.status-dot{font-size:8px}.banner{font-size:10px;padding:11px 12px;line-height:1.7;margin-bottom:25px}.banner button{font-size:10px}.page-heading{margin:30px 0;display:block}.page-heading>.primary{margin-top:23px}.eyebrow{font-size:8px;letter-spacing:1.3px;margin-bottom:14px}h1{font-size:37px;letter-spacing:-1.7px}h1 em{font-size:41px}.subtitle{font-size:11px;margin-top:14px}.section-heading{margin-bottom:16px}.section-heading h2{font-size:16px}.section-heading>span{font-size:8px}.group-grid{grid-template-columns:1fr;gap:16px}.group-card{padding:21px}.group-card-top{margin-bottom:18px}.group-card h3{font-size:19px}.group-card p{font-size:11px}.card-bottom>span{font-size:10px}.new-group-card{min-height:130px;gap:11px}.bottom-note{font-size:9px;margin:30px 0 45px;line-height:1.7}.empty-state{padding:33px 17px}.empty-state h2{font-size:18px;line-height:1.5}.empty-state p{font-size:11px}.empty-art span{font-size:29px;width:57px;height:64px}.empty-state .text-button{font-size:9px}.bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;justify-content:space-around;border-top:1px solid #e2e7d7;background:#fafbf6ef;backdrop-filter:blur(12px);padding:10px 10px calc(9px + env(safe-area-inset-bottom));z-index:3}.bottom-nav button{display:flex;flex-direction:column;align-items:center;gap:5px;background:transparent;color:#97a08b;font-size:9px;padding:5px 28px;border-radius:10px}.bottom-nav button.selected{color:#31583b;background:#e9efdf}.bottom-nav button svg{width:19px;height:19px}footer{font-size:8px;line-height:1.6;margin-top:30px;flex-direction:column;gap:8px}.group-title h1{font-size:27px;line-height:1.2}.group-title>div{grid-template-columns:49px 1fr;column-gap:12px}.group-title .group-emoji{width:46px;height:48px;font-size:25px}.group-title>.primary{width:100%;margin-top:20px}.group-toolbar{gap:8px}.group-toolbar button{flex:1;justify-content:center;font-size:10px;padding:10px 8px;gap:6px}.group-toolbar button svg{width:15px}.panel{padding:20px}.expense-row{gap:9px}.expense-row>strong{font-size:10px}.expense-icon{width:33px;height:33px;font-size:17px}.expense-row>svg{display:none}.detail-grid{gap:17px}.panel .section-heading>span{max-width:120px;text-align:right;line-height:1.5}.settings-grid{gap:17px}input:not([type=checkbox]),select{font-size:16px}dialog{padding:23px;max-height:calc(100dvh - 30px)}.dialog-head h2{font-size:19px}.emoji-picker{gap:5px}.emoji-picker button{width:39px;height:42px;font-size:21px}.notice{font-size:10px}.alert{font-size:11px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+.currency-totals{display:grid;gap:5px;text-align:right;line-height:1.5}.currency-heading{font-size:11px;letter-spacing:1.3px;color:#637b53;margin:22px 0 5px}.currency-section+.currency-section{margin-top:23px;padding-top:3px;border-top:1px solid var(--line)}.currency-section .small-empty{padding:15px 0}.pill{max-width:65%;line-height:1.7;text-align:right}.theme-picker{display:flex;gap:7px;margin:20px 0 0;padding:0;border:0;min-width:0}.theme-picker label{display:flex;align-items:center;justify-content:center;gap:7px;flex:1;padding:13px 9px;min-height:45px;font-size:12px;border:1px solid var(--line);border-radius:9px;background:#f7f8f1;cursor:pointer;position:relative}.theme-picker .theme-selected{background:#e5edd9;border-color:#7d9c68;color:#315634;font-weight:600}.theme-picker input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}.theme-picker label:focus-within{outline:3px solid #8dbb69;outline-offset:3px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+:root[data-theme=dark]{color:#e4ece0;background:#151e19;--forest:#b5d59a;--muted:#b3bfac;--line:#354236;--cream:#151e19;--lime:#c5e6a2;color-scheme:dark}
+[data-theme=dark] .sidebar{background:#1a261e}
+[data-theme=dark] .brand-mark{background:#b5d59a;color:#22351f}
+[data-theme=dark] .sidebar nav button{color:#b6c1ae}
+[data-theme=dark] .sidebar nav button.selected{background:#30432b;color:#d5ebc1}
+[data-theme=dark] .side-caption,[data-theme=dark] .eyebrow,[data-theme=dark] .topline,[data-theme=dark] .bottom-note,[data-theme=dark] footer,[data-theme=dark] .section-heading>span{color:#aab99f}
+[data-theme=dark] .avatar{background:#35472f;color:#d3e7c4}
+[data-theme=dark] .banner{background:#273624;border-color:#3d5134;color:#c4d4b7}
+[data-theme=dark] .banner button{color:#c7e6ad}
+[data-theme=dark] h1 em{color:#a7ca8e}
+[data-theme=dark] .primary{background:#b5d59a;color:#1b311d}
+[data-theme=dark] .primary:hover{background:#c9e4b3}
+[data-theme=dark] .secondary{background:#2b3b27;color:#d0e4c1;border-color:#43553a}
+[data-theme=dark] .group-card,[data-theme=dark] .panel{background:#202b23}
+[data-theme=dark] .group-emoji,[data-theme=dark] .group-card:nth-child(3n+2) .group-emoji,[data-theme=dark] .expense-icon{background:#34412e}
+[data-theme=dark] .pill{border-color:#4b5b42;color:#c8d7bb}
+[data-theme=dark] .group-card p,[data-theme=dark] .row-description small,[data-theme=dark] .balance-row>small{color:#b0bea4}
+[data-theme=dark] .card-bottom,[data-theme=dark] .expense-row,[data-theme=dark] .balance-row{border-color:#364331}
+[data-theme=dark] .avatar-stack span{border-color:#202b23;color:#394334}
+[data-theme=dark] .new-group-card{background:#202d20;border-color:#58694b;color:#b3c79f}
+[data-theme=dark] .new-group-card span{color:#a6b398}
+[data-theme=dark] .count,[data-theme=dark] .icon-button{background:#34432d;color:#d2e3c3}
+[data-theme=dark] .empty-state{background:#222f21;border-color:#3c4a32}
+[data-theme=dark] .empty-state p,[data-theme=dark] .small-empty{color:#b4c3a7}
+[data-theme=dark] .empty-art span{background:#344330;box-shadow:0 7px 20px #0002}
+[data-theme=dark] .empty-art span:nth-child(2){background:#544833}
+[data-theme=dark] .empty-art span:nth-child(3){background:#3c4c31}
+[data-theme=dark] .text-button,[data-theme=dark] .back,[data-theme=dark] .file-label{color:#bed8a7!important}
+[data-theme=dark] .group-toolbar button{background:#2c3b27;border-color:#405136;color:#d5e4c8}
+[data-theme=dark] .muted{color:#b3bfac}
+[data-theme=dark] .positive{color:#b7df9c}
+[data-theme=dark] .negative{color:#edb58d}
+[data-theme=dark] .setup-note{background:#2c3a26;color:#c8d8bb}
+[data-theme=dark] .alert,[data-theme=dark] .form-error{background:#432c23;border-color:#75533e;color:#f2c3a6}
+[data-theme=dark] .notice{color:#bfdca7}
+[data-theme=dark] .danger{color:#efb99b!important}
+[data-theme=dark] dialog{background:#202b23;color:#e4ece0;border-color:#45573a;box-shadow:0 25px 100px #0008}
+[data-theme=dark] dialog::backdrop{background:#080e0baf}
+[data-theme=dark] form label,[data-theme=dark] dialog label{color:#c3d3b7}
+[data-theme=dark] input:not([type=checkbox]):not([type=radio]),[data-theme=dark] select{background:#17221a;border-color:#4c5c40;color:#e3eddb}
+[data-theme=dark] input::placeholder{color:#a0ae93}
+[data-theme=dark] label small{color:#b1bea5}
+[data-theme=dark] .emoji-picker button{background:#303e29}
+[data-theme=dark] .emoji-picker button.chosen{background:#445d35;border-color:#b9d99a}
+[data-theme=dark] .split-members{border-color:#435536}
+[data-theme=dark] .repayment span,[data-theme=dark] .currency-heading{color:#bfdba6}
+[data-theme=dark] .theme-picker label{background:#263321;border-color:#46563b;color:#cbdcc0}
+[data-theme=dark] .theme-picker .theme-selected{background:#405735;border-color:#b1d291;color:#edf7e5}
+[data-theme=dark] .bottom-nav{background:#1b281ff2;border-color:#3a4932}
+[data-theme=dark] .bottom-nav button{color:#aebf9e}
+[data-theme=dark] .bottom-nav button.selected{background:#344b2b;color:#dcf1cb}
+@media(max-width:700px){.currency-totals{font-size:9px}.theme-picker label{font-size:12px}}

@@ -35,7 +35,7 @@ async function performSync(scope: string, userId: string) {
     if (!saved.dirty) continue;
     const { data, error } = await client.rpc('save_group', { p_document: saved.group, p_expected_revision: saved.baseRevision });
     if (error) {
-      if (error.message.includes('revision_conflict')) { conflicts.push(saved.group.id); continue; }
+      if (error.message.includes('revision_conflict') || error.message.includes('Please update Fairshare')) { conflicts.push(saved.group.id); continue; }
       throw error;
     }
     const remote = validateRemote(data);

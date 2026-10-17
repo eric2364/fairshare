@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {parseMoney,splitAmount,calculateBalances,simplifyDebts} from './money';
+import {parseMoney,splitAmount,calculateBalances,simplifyDebts,groupCurrencies,expenseTotals} from './money';
 import {validateGroup} from './validation';
 import type {Group} from './types';
 const group:Group={id:'g',name:'Dinner',emoji:'🍽️',currency:'HKD',revision:0,updatedAt:'2026-10-18T12:00:00Z',members:[{id:'a',name:'A'},{id:'b',name:'B'},{id:'c',name:'C'}],expenses:[{id:'e',description:'Food',amount:10000,payerId:'a',date:'2026-10-18',createdAt:'2026-10-18T12:00:00Z',splits:splitAmount(10000,['a','b','c'],'equal')}],settlements:[]};
@@ -15,3 +15,33 @@ describe('backup validation',()=>{
  it('accepts valid data and strips unrelated fields',()=>{expect(validateGroup({...group,untrusted:'value'})).toEqual(group);});
  it('rejects invalid split totals, duplicate ids, invalid dates and member references',()=>{for(const invalid of [{...group,members:[...group.members,group.members[0]]},{...group,expenses:[{...group.expenses[0],amount:1}]},{...group,expenses:[{...group.expenses[0],payerId:'unknown'}]},{...group,expenses:[{...group.expenses[0],date:'2026-02-30'}]},{...group,settlements:[{id:'s',fromId:'a',toId:'a',amount:2,date:'2026-10-18'}]}])expect(()=>validateGroup(invalid)).toThrow();});
 });
+
+describe('per-entry currencies',()=>{
+ const mixed:Group={...group,expenses:[...group.expenses,{...group.expenses[0],id:'usd',currency:'USD',amount:3000,payerId:'b',splits:splitAmount(3000,['a','b','c'],'equal')}],settlements:[{id:'usd-payment',currency:'USD',fromId:'a',toId:'b',amount:400,date:'2026-10-18'}]};
+ it('keeps equal-looking HKD and USD amounts in separate ledgers',()=>{
+  expect(calculateBalances(mixed,'HKD')).toEqual({a:6666,b:-3333,c:-3333});
+  expect(calculateBalances(mixed,'USD')).toEqual({a:-600,b:1600,c:-1000});
+  expect(calculateBalances(mixed,'EUR')).toEqual({a:0,b:0,c:0});
+ });
+ it('settles each currency without reducing debts in other currencies',()=>{
+  const transfers=simplifyDebts(mixed,'USD');
+  expect(transfers.every(t=>t.currency==='USD')).toBe(true);
+  const settled={...mixed,settlements:[...mixed.settlements,...transfers.map((t,i)=>({...t,id:`paid-${i}`,date:'2026-10-18'}))]};
+  expect(calculateBalances(settled,'USD')).toEqual({a:0,b:0,c:0});
+  expect(calculateBalances(settled,'HKD')).toEqual(calculateBalances(mixed,'HKD'));
+ });
+ it('preserves currencies through backup round trips',()=>expect(validateGroup(JSON.parse(JSON.stringify(mixed)))).toEqual(mixed));
+ it('rejects invalid or null currencies on expenses and repayments',()=>{
+  for(const currency of ['XYZ',null,1,'']){
+   expect(()=>validateGroup({...mixed,expenses:[{...mixed.expenses[0],currency}]})).toThrow();
+   expect(()=>validateGroup({...mixed,settlements:[{...mixed.settlements[0],currency}]})).toThrow();
+  }
+ });
+ it('uses the legacy default currency for existing repayments',()=>{
+  const legacy={...mixed,settlements:[{id:'legacy',fromId:'b',toId:'a',amount:3333,date:'2026-10-18'}]};
+  expect(calculateBalances(legacy,'HKD')).toEqual({a:3333,b:0,c:-3333});
+  expect(calculateBalances(legacy,'USD')).toEqual({a:-1000,b:2000,c:-1000});
+ });
+});
+
+it('reports totals per currency and lists settlement-only currencies',()=>{const g={...group,expenses:[...group.expenses,{...group.expenses[0],id:'usd',currency:'USD',amount:1234}],settlements:[{id:'s',currency:'EUR',fromId:'a',toId:'b',amount:10,date:'2026-10-18'}]};expect(expenseTotals(g)).toEqual({HKD:10000,USD:1234});expect(groupCurrencies(g)).toEqual(['EUR','HKD','USD']);});

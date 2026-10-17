@@ -31,17 +31,26 @@ export function splitAmount(amount:number,memberIds:string[],mode:SplitMode,valu
  for(let i=0;i<remaining;i++)ranked[i].base++;
  return portions.map(p=>({memberId:memberIds[p.i],amount:p.base}));
 }
-export function calculateBalances(group:Group):Record<string,number> {
+export function groupCurrencies(group:Group):string[] {
+ const currencies=new Set([...group.expenses,...group.settlements].map(entry=>entry.currency??group.currency));
+ return currencies.size ? [...currencies].sort() : [group.currency];
+}
+export function expenseTotals(group:Group):Record<string,number> {
+ const totals:Record<string,number>={};
+ for(const expense of group.expenses){const currency=expense.currency??group.currency;totals[currency]=(totals[currency]??0)+expense.amount;}
+ return totals;
+}
+export function calculateBalances(group:Group,currency=group.currency):Record<string,number> {
  const balances:Record<string,number>=Object.fromEntries(group.members.map(m=>[m.id,0]));
- for(const e of group.expenses){balances[e.payerId]+=e.amount;for(const s of e.splits)balances[s.memberId]-=s.amount;}
- for(const s of group.settlements){balances[s.fromId]+=s.amount;balances[s.toId]-=s.amount;}
+ for(const e of group.expenses){if((e.currency??group.currency)!==currency)continue;balances[e.payerId]+=e.amount;for(const s of e.splits)balances[s.memberId]-=s.amount;}
+ for(const s of group.settlements){if((s.currency??group.currency)!==currency)continue;balances[s.fromId]+=s.amount;balances[s.toId]-=s.amount;}
  return balances;
 }
-export function simplifyDebts(group:Group):Transfer[]{
- const balances=calculateBalances(group);
+export function simplifyDebts(group:Group,currency=group.currency):Transfer[]{
+ const balances=calculateBalances(group,currency);
  const debtors=Object.entries(balances).filter(([,a])=>a<0).map(([id,a])=>({id,amount:-a}));
  const creditors=Object.entries(balances).filter(([,a])=>a>0).map(([id,amount])=>({id,amount}));
  const transfers:Transfer[]=[];let i=0,j=0;
- while(i<debtors.length&&j<creditors.length){const amount=Math.min(debtors[i].amount,creditors[j].amount);transfers.push({fromId:debtors[i].id,toId:creditors[j].id,amount});debtors[i].amount-=amount;creditors[j].amount-=amount;if(!debtors[i].amount)i++;if(!creditors[j].amount)j++;}
+ while(i<debtors.length&&j<creditors.length){const amount=Math.min(debtors[i].amount,creditors[j].amount);transfers.push({currency,fromId:debtors[i].id,toId:creditors[j].id,amount});debtors[i].amount-=amount;creditors[j].amount-=amount;if(!debtors[i].amount)i++;if(!creditors[j].amount)j++;}
  return transfers;
 }

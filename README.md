@@ -56,6 +56,14 @@ Invitation links expire after seven days and can be used once by a new group mem
 
 Each group has a server revision. Concurrent edits are detected rather than silently overwriting the server. A conflict preserves the local changes; export a backup before discarding the local version and loading the server version. Automatic merging of simultaneous edits is outside this initial version.
 
+## Currencies and appearance
+
+Choose a currency for each expense, including when editing an existing expense. The group's currency is the default for new entries and the fallback for older expenses and repayments that have no currency field. Existing data keeps its original meaning.
+
+Expense totals, member balances, and suggested repayments are shown separately for each currency. Recording a suggested repayment saves that currency with the payment. There is no exchange-rate conversion or combined balance across currencies. Supported currencies are HKD, USD, EUR, GBP, SGD, AUD, and CAD.
+
+In Settings → Appearance, choose System, Light, or Dark. System follows your device's appearance, including changes while the app is open. Your choice is saved in this browser and does not change other people's settings.
+
 ## Backups and restore
 
 Export the current space from Settings. Restore validates the whole backup first, then asks you to review imported groups. Each restored group is a new independent copy, so it cannot overwrite a shared original. When signed in, select which member represents you in each imported group. Existing account links are removed; invite friends again for the new copies.
@@ -91,12 +99,12 @@ The app uses the bundled Fairshare backend unless non-empty Actions variables ov
 - Activity shows current expenses and repayments, not an immutable audit trail of every edit.
 - Repayment recording currently settles a suggested full balance; entering partial repayments is deferred.
 - The first version has no receipt scanning, currency conversion, recurring expenses, or payment integration.
-- Use one currency per group. Balances in different currencies must not be added together without explicit conversion.
+- Each expense and repayment has its own currency; balances and totals remain separate with no exchange-rate conversion.
 - Monetary calculations use integer minor units and deterministic rounding.
 - Offline access depends on previously loaded application assets and locally stored data.
 - Invitation and sync functionality require a configured Supabase project and successful authentication.
 
-Before relying on it for a trip, test equal and unequal splits, settlement recording, two-account sharing, interrupted sync, simultaneous edits, and backup restore on the actual iPhones you plan to use.
+Before relying on it for a trip, test equal and unequal splits, mixed-currency balances, settlement recording, two-account sharing, interrupted sync, simultaneous edits, and backup restore on the actual iPhones you plan to use.
 
 ## Current signup configuration
 

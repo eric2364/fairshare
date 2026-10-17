@@ -15,3 +15,5 @@ describe('offline sync',()=>{
  it('rejects cross-account synchronization',async()=>{await expect(syncGroups('bob','alice')).rejects.toThrow('Sign in');expect(mocks.rpc).not.toHaveBeenCalled();});
  it('serializes simultaneous sync requests without duplicate writes',async()=>{await saveGroupLocally('alice',sample());await Promise.all([syncGroups('alice','alice'),syncGroups('alice','alice'),syncGroups('alice','alice')]);expect(mocks.rpc).toHaveBeenCalledTimes(1);});
 });
+
+it('offers conflict recovery for currency-stripped data saved by an older app',async()=>{const g=sample();await saveGroupLocally('alice',g);mocks.rpc.mockResolvedValue({error:{message:'Please update Fairshare before editing this group.'},data:null});const result=await syncGroups('alice','alice');expect(result.conflicts).toEqual([g.id]);expect(result.groups[0]).toEqual(g);});
