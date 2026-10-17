@@ -57,3 +57,15 @@
 [data-theme=dark] .bottom-nav button{color:#aebf9e}
 [data-theme=dark] .bottom-nav button.selected{background:#344b2b;color:#dcf1cb}
 @media(max-width:700px){.currency-totals{font-size:9px}.theme-picker label{font-size:12px}}
+/* Small labels and financial amounts retain readable contrast in light mode. */
+:root:not([data-theme=dark]){--muted:#5d6d56}
+:root:not([data-theme=dark]) .muted,:root:not([data-theme=dark]) .row-description small,:root:not([data-theme=dark]) label small,:root:not([data-theme=dark]) .group-card p,:root:not([data-theme=dark]) .balance-row>small{color:#5d6d56}
+:root:not([data-theme=dark]) .negative{color:#925b3a}
+:root:not([data-theme=dark]) .side-caption,:root:not([data-theme=dark]) .eyebrow,:root:not([data-theme=dark]) .topline,:root:not([data-theme=dark]) .bottom-note,:root:not([data-theme=dark]) footer,:root:not([data-theme=dark]) .section-heading>span,:root:not([data-theme=dark]) .pill{color:#626f57}
+:root:not([data-theme=dark]) .empty-state p,:root:not([data-theme=dark]) .small-empty,:root:not([data-theme=dark]) .new-group-card,:root:not([data-theme=dark]) .new-group-card span{color:#626f57}
+:root:not([data-theme=dark]) .text-button,:root:not([data-theme=dark]) .back,:root:not([data-theme=dark]) .file-label{color:#546b43!important}
+:root:not([data-theme=dark]) input::placeholder{color:#6c7662}
+:root:not([data-theme=dark]) .bottom-nav button{color:#626f57}
+:root:not([data-theme=dark]) .danger{color:#925b3a!important}
+:root:not([data-theme=dark]) .positive,:root:not([data-theme=dark]) .notice,:root:not([data-theme=dark]) .repayment span{color:#496d3f}
+:root:not([data-theme=dark]) .banner,:root:not([data-theme=dark]) .count,:root:not([data-theme=dark]) .sidebar nav button{color:#55664b}

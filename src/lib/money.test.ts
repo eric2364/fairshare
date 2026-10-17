@@ -45,3 +45,13 @@ describe('per-entry currencies',()=>{
 });
 
 it('reports totals per currency and lists settlement-only currencies',()=>{const g={...group,expenses:[...group.expenses,{...group.expenses[0],id:'usd',currency:'USD',amount:1234}],settlements:[{id:'s',currency:'EUR',fromId:'a',toId:'b',amount:10,date:'2026-10-18'}]};expect(expenseTotals(g)).toEqual({HKD:10000,USD:1234});expect(groupCurrencies(g)).toEqual(['EUR','HKD','USD']);});
+
+
+it('splits large debts into valid recordable repayments without losing cents',()=>{
+ const huge:Group={...group,expenses:[0,1].map(i=>({...group.expenses[0],id:`large-${i}`,amount:1_000_000_000,splits:[{memberId:'b',amount:1_000_000_000}]}))};
+ const transfers=simplifyDebts(huge);
+ expect(transfers.map(t=>t.amount)).toEqual([1_000_000_000,1_000_000_000]);
+ let current=huge;
+ for(const [i,t] of transfers.entries())current=validateGroup({...current,settlements:[...current.settlements,{...t,id:`paid-${i}`,date:'2026-10-18'}]});
+ expect(calculateBalances(current)).toEqual({a:0,b:0,c:0});
+});

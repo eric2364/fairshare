@@ -51,6 +51,6 @@ export function simplifyDebts(group:Group,currency=group.currency):Transfer[]{
  const debtors=Object.entries(balances).filter(([,a])=>a<0).map(([id,a])=>({id,amount:-a}));
  const creditors=Object.entries(balances).filter(([,a])=>a>0).map(([id,amount])=>({id,amount}));
  const transfers:Transfer[]=[];let i=0,j=0;
- while(i<debtors.length&&j<creditors.length){const amount=Math.min(debtors[i].amount,creditors[j].amount);transfers.push({currency,fromId:debtors[i].id,toId:creditors[j].id,amount});debtors[i].amount-=amount;creditors[j].amount-=amount;if(!debtors[i].amount)i++;if(!creditors[j].amount)j++;}
+ while(i<debtors.length&&j<creditors.length){const amount=Math.min(debtors[i].amount,creditors[j].amount,MAX_MONEY);transfers.push({currency,fromId:debtors[i].id,toId:creditors[j].id,amount});debtors[i].amount-=amount;creditors[j].amount-=amount;if(!debtors[i].amount)i++;if(!creditors[j].amount)j++;}
  return transfers;
 }

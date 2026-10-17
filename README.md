@@ -54,6 +54,8 @@ Signed-in accounts and local mode use separate browser storage scopes. Signing i
 
 Invitation links expire after seven days and can be used once by a new group member. Add the person under Members, then create an invitation for their unclaimed place. When they join, their expenses and balances stay attached to that person. Any existing group member can invite others. Treat an invitation link as access to the group and share it only with the intended person.
 
+Each local group snapshot also has a version token. Saving from an outdated tab is rejected before it can replace newer local data; reload or sync and re-enter the change. Sync requests use the access token captured for their originating account, so switching accounts cannot redirect an in-flight request into another account.
+
 Each group has a server revision. Concurrent edits are detected rather than silently overwriting the server. A conflict preserves the local changes; export a backup before discarding the local version and loading the server version. Automatic merging of simultaneous edits is outside this initial version.
 
 ## Currencies and appearance
@@ -97,7 +99,7 @@ The app uses the bundled Fairshare backend unless non-empty Actions variables ov
 
 - Expenses and repayments are bookkeeping records; the app does not move money.
 - Activity shows current expenses and repayments, not an immutable audit trail of every edit.
-- Repayment recording currently settles a suggested full balance; entering partial repayments is deferred.
+- Repayment recording settles the displayed suggested amount; very large balances are divided into multiple recordable payments. Entering a custom partial repayment is deferred.
 - The first version has no receipt scanning, currency conversion, recurring expenses, or payment integration.
 - Each expense and repayment has its own currency; balances and totals remain separate with no exchange-rate conversion.
 - Monetary calculations use integer minor units and deterministic rounding.
