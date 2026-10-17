@@ -148,3 +148,18 @@ describe('session-bound requests', () => {
     expect(mocks.rpc).not.toHaveBeenCalled(); expect(mocks.select).not.toHaveBeenCalled();
   });
 });
+
+it('the installed Supabase SDK honors explicit Authorization over a changed global session', async () => {
+  const { createClient } = await import('@supabase/supabase-js');
+  const requests: Headers[] = [];
+  const client = createClient('https://example.invalid', 'test-publishable-key', {
+    accessToken: async () => 'bob-token',
+    global: { fetch: async (_input, init) => {
+      requests.push(new Headers(init?.headers));
+      return new Response('[]', { status: 200, headers: { 'Content-Type': 'application/json' } });
+    } },
+  });
+  await client.rpc('save_group', {}).setHeader('Authorization', 'Bearer alice-token');
+  await client.from('expense_groups').select('document').setHeader('Authorization', 'Bearer alice-token');
+  expect(requests.map(headers => headers.get('Authorization'))).toEqual(['Bearer alice-token', 'Bearer alice-token']);
+});
