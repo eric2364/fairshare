@@ -8,3 +8,4 @@ dist/
 playwright-report/
 test-results/
 .openai/*.local.*
+supabase/.temp/

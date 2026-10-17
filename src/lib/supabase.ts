@@ -1,9 +1,10 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { deployment } from './deployment';
 let client: SupabaseClient | null | undefined;
 export function getClient(): SupabaseClient | null {
   if (client !== undefined) return client;
-  const url = import.meta.env.VITE_SUPABASE_URL;
-  const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  const url = import.meta.env.VITE_SUPABASE_URL || deployment.supabaseUrl;
+  const key = import.meta.env.VITE_SUPABASE_ANON_KEY || deployment.supabasePublishableKey;
   client = url && key ? createClient(url, key, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }) : null;
   return client;
 }

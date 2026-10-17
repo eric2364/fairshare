@@ -14,7 +14,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open the local URL printed by Vite. With Supabase variables left empty, use local mode to try the app. Local data is stored in this browser, not automatically shared with other devices. Export backups before clearing browser data or changing devices.
+Open the local URL printed by Vite. The app defaults to the connected Fairshare Supabase project. You can still use it without signing in: those groups stay in this browser and are not shared automatically. Export backups before clearing browser data or changing devices.
 
 ```sh
 npm test
@@ -25,16 +25,20 @@ npm run preview
 
 The production build is written to `dist/`. Changes to environment variables require restarting Vite or rebuilding the deployment.
 
-## Connect your Supabase project
+## Supabase configuration
+
+The default backend is the Fairshare project [`scsfgdtaqktyweyaomph`](https://supabase.com/dashboard/project/scsfgdtaqktyweyaomph), at `https://scsfgdtaqktyweyaomph.supabase.co`. Its project URL and browser-safe publishable key are in `src/lib/deployment.ts`. The initial schema has been applied; the live SQL integration checks passed and their test records were rolled back.
+
+The publishable key is intentionally public. User authentication, group membership checks, database permissions, and row-level security protect private data. Never put a Supabase secret key, service-role key, database password, or GitHub token in frontend code or `VITE_` variables. [Supabase API key guidance](https://supabase.com/docs/guides/api/api-keys)
+
+To use a different project:
 
 1. Create or select a Supabase project you control.
-2. Apply the SQL files in `supabase/migrations/` in filename order using the Supabase SQL editor or CLI. Read the migrations before applying them to an existing project.
-3. Copy the project URL and browser-safe publishable/anon key into `.env.local` using the names in `.env.example`.
-4. In Supabase Authentication, set the Site URL to `https://eric2364.github.io/fairshare/` and allow the exact local and deployed redirect URLs used for sign-in.
-5. Configure email delivery for your invited users and test sign-in with separate accounts.
-6. Rebuild the app and verify that one account can invite another, both can see their group, and an unrelated account cannot read it.
-
-Only browser-safe project credentials belong in `VITE_` variables: Vite embeds them in the public JavaScript bundle. Never put a Supabase service-role key, secret API key, database password, or GitHub token in frontend configuration. Group access must be enforced by database policies and authenticated functions, not by hiding controls in the interface.
+2. Apply all SQL files in `supabase/migrations/` in filename order using the Supabase SQL editor or CLI. Read migrations before applying them to an existing project. Besides the expense-sharing schema, the helper-hardening migration revokes public execution of Supabase's internal `rls_auto_enable()` helper when it exists.
+3. Set both `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in `.env.local`. Despite the legacy variable name, use the browser-safe publishable key. Non-empty values override the bundled defaults; leaving them blank uses Fairshare's default project.
+4. In Supabase Authentication, set the Site URL to `https://eric2364.github.io/fairshare/` (or your own deployment) and allow the exact local and deployed redirect URLs used for sign-in.
+5. Choose the project's email-confirmation policy and configure email delivery as needed. The application follows the project's Auth settings; it does not assume confirmation is disabled or custom SMTP is configured.
+6. Restart Vite or rebuild, then verify that one account can invite another, both can see their group, and an unrelated account cannot read it.
 
 ## Use it on iPhone
 
@@ -69,7 +73,7 @@ The GitHub Actions workflow runs `npm ci`, unit tests, database security tests, 
 The `pages.yml` workflow tests and builds pushes to `main`, then publishes `dist/` to GitHub Pages. It can also be started manually from Actions.
 
 1. In repository Settings → Pages, select **GitHub Actions** as the source.
-2. In Settings → Secrets and variables → Actions → Variables, add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` with your project URL and browser-safe publishable/anon key.
+2. The default Fairshare backend requires no Actions variables. To override it, add both `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` under Settings → Secrets and variables → Actions → Variables, using your project URL and browser-safe publishable key.
 3. Push to `main` or manually run **Deploy to GitHub Pages**. Check that both build and deploy jobs succeed before sharing the site.
 
 The deployment sets `BASE_PATH=/fairshare/` so assets and the installed PWA work under the repository URL. Local development defaults to `/`. To reproduce the Pages build locally:
@@ -79,7 +83,7 @@ BASE_PATH=/fairshare/ npm run build
 npm run preview
 ```
 
-The app operates in local mode until the Supabase variables are supplied. After changing Actions variables, run a fresh deployment to embed them. A GitHub Pages deployment does not apply database migrations; apply them to Supabase separately.
+The app uses the bundled Fairshare backend unless non-empty Actions variables override it. After changing these variables, run a fresh deployment to embed them. A GitHub Pages deployment does not apply database migrations; apply them to Supabase separately.
 
 ## Scope and operational limits
 
@@ -93,3 +97,7 @@ The app operates in local mode until the Supabase variables are supplied. After 
 - Invitation and sync functionality require a configured Supabase project and successful authentication.
 
 Before relying on it for a trip, test equal and unequal splits, settlement recording, two-account sharing, interrupted sync, simultaneous edits, and backup restore on the actual iPhones you plan to use.
+
+## Current signup configuration
+
+Email/password signup is enabled with email confirmation disabled, as approved for this friends-only app. Email addresses are not verified. Group access is still based on authenticated account IDs and private single-use invitation links, never on an email address. Share invitations directly with the intended person. Custom SMTP is not configured; email-based recovery and confirmation must be configured before enabling those features.
