@@ -60,9 +60,11 @@ Each group has a server revision. Concurrent edits are detected rather than sile
 
 ## Currencies and appearance
 
+Choose the currencies used by a group when creating it; HKD, JPY, TWD and USD are selected by default. Use the group's Currencies button to adjust this later. The default currency and any currency already used by an expense or repayment must remain selected. Older groups without a saved selection keep all supported currencies available until configured.
+
 Choose a currency for each expense, including when editing an existing expense. The group's currency is the default for new entries and the fallback for older expenses and repayments that have no currency field. Existing data keeps its original meaning.
 
-Expense totals, member balances, and suggested repayments are shown separately for each currency. Recording a suggested repayment saves that currency with the payment. There is no exchange-rate conversion or combined balance across currencies. Supported currencies are HKD, USD, EUR, GBP, SGD, AUD, and CAD.
+Expense totals, member balances, and suggested repayments are shown separately for each currency. Recording a suggested repayment saves that currency with the payment. There is no exchange-rate conversion or combined balance across currencies. Supported currencies are HKD, JPY, TWD, USD, EUR, GBP, SGD, AUD, and CAD. JPY is entered and split in whole yen; the other currencies support two decimal places. Changing an entry's currency changes its denomination, not its exchange value.
 
 In Settings → Appearance, choose System, Light, or Dark. System follows your device's appearance, including changes while the app is open. Your choice is saved in this browser and does not change other people's settings.
 

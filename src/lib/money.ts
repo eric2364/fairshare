@@ -1,14 +1,18 @@
 import type { Group, SplitMode, Transfer } from './types';
 export const MAX_MONEY = 1_000_000_000;
-export function parseMoney(input: string): number {
+export const SUPPORTED_CURRENCIES = ['HKD','JPY','TWD','USD','EUR','GBP','SGD','AUD','CAD'];
+export function currencyDigits(currency:string):number { return currency==='JPY'?0:2; }
+export function amountToInput(amount:number,currency:string):string { return (amount/(10**currencyDigits(currency))).toFixed(currencyDigits(currency)); }
+export function availableCurrencies(group:Group):string[] { return group.currencies??[...SUPPORTED_CURRENCIES]; }
+export function parseMoney(input: string,currency='HKD'): number {
  const value=input.trim();
- if (!/^\d+(\.\d{1,2})?$/.test(value)) throw new Error('Enter a positive amount with up to two decimal places.');
+ if (!(currencyDigits(currency)===0?/^\d+$/:/^\d+(\.\d{1,2})?$/).test(value)) throw new Error(currencyDigits(currency)===0?'Enter a whole-yen amount without decimals.':'Enter a positive amount with up to two decimal places.');
  const [whole, fraction='']=value.split('.');
- const cents=Number(whole)*100+Number(fraction.padEnd(2,'0'));
+ const cents=Number(whole)*(10**currencyDigits(currency))+(currencyDigits(currency)?Number(fraction.padEnd(2,'0')):0);
  if (!Number.isSafeInteger(cents)||cents>MAX_MONEY) throw new Error('Amount is too large.');
  return cents;
 }
-export function formatMoney(amount:number,currency:string):string {return new Intl.NumberFormat('en-HK',{style:'currency',currency}).format(amount/100);}
+export function formatMoney(amount:number,currency:string):string {return new Intl.NumberFormat('en-HK',{style:'currency',currency}).format(amount/(10**currencyDigits(currency)));}
 export function splitAmount(amount:number,memberIds:string[],mode:SplitMode,values?:number[]) {
  if(!Number.isSafeInteger(amount)||amount<=0||amount>MAX_MONEY)throw new Error('Enter an amount greater than zero.');
  if(!memberIds.length||new Set(memberIds).size!==memberIds.length)throw new Error('Choose at least one unique participant.');

@@ -45,7 +45,7 @@ mixed.settlements.push({id:'payment',fromId:'b',toId:'a',amount:50,date:'2026-10
 let multi=await save(mixed,4);
 assert.equal(multi.expenses[0].currency,'USD');assert.equal(multi.expenses[1].currency,'EUR');
 assert.equal(multi.expenses[2].currency,undefined);assert.equal(multi.currency,'HKD');
-for(const invalid of ['JPY','usd','',null,123]) {
+for(const invalid of ['CNY','usd','',null,123]) {
  const badExpense=structuredClone(multi);badExpense.expenses[0].currency=invalid;
  await assert.rejects(()=>save(badExpense,5),/invalid_expense_currency/);
  const badSettlement=structuredClone(multi);badSettlement.settlements[0].currency=invalid;
@@ -70,5 +70,42 @@ await assert.rejects(()=>save(changedDefault,6),/currency_cannot_change/);
 // Deletion remains possible; it does not relabel an existing entry.
 const deleted=structuredClone(explicit);deleted.expenses.splice(0,1);deleted.settlements=[];
 const afterDelete=await save(deleted,6);assert.equal(afterDelete.expenses.length,3);
-console.log('PASS: migration, create/update, lost-response replay, null/stale revision rejection, numeric typing, split totals, RLS isolation, direct write denial, invite claim/single use, membership preservation, per-entry currencies, invalid currency rejection, legacy compatibility, old-client denomination-loss rejection.');
+// Explicit currency choices constrain both new entries and inherited legacy entries.
+const chosen=structuredClone(afterDelete);
+chosen.currencies=['HKD','JPY','TWD','EUR'];
+chosen.expenses.push({...structuredClone(group.expenses[0]),id:'jpy-train',currency:'JPY'});
+chosen.expenses.push({...structuredClone(group.expenses[0]),id:'twd-tea',currency:'TWD'});
+chosen.settlements=[{id:'jpy-paid',fromId:'b',toId:'a',amount:1,date:'2026-10-18',currency:'JPY'}];
+const withChoices=await save(chosen,7);
+assert.deepEqual(withChoices.currencies,chosen.currencies);
+assert.equal(withChoices.expenses.at(-2).amount,101); // 101 integer yen, never multiplied/divided on the server.
+assert.equal(withChoices.expenses.at(-1).amount,101); // 101 integer TWD cents.
+assert.deepEqual(await save(chosen,7),withChoices);
+for(const invalid of [[],null,'HKD',['HKD','HKD'],['HKD','CNY'],['HKD',1],['HKD',null],['EUR','JPY','TWD']]) {
+ const bad=structuredClone(withChoices);bad.currencies=invalid;
+ await assert.rejects(()=>save(bad,8),/invalid_group_currencies/);
+}
+const missingUsed=structuredClone(withChoices);missingUsed.currencies=['HKD','JPY','TWD'];
+await assert.rejects(()=>save(missingUsed,8),/expense_currency_not_enabled/);
+const missingSettlement=structuredClone(withChoices);
+missingSettlement.expenses=missingSettlement.expenses.filter(e=>e.currency!=='JPY');
+missingSettlement.currencies=['HKD','TWD','EUR'];
+await assert.rejects(()=>save(missingSettlement,8),/settlement_currency_not_enabled/);
+const strippedChoices=structuredClone(withChoices);delete strippedChoices.currencies;
+await assert.rejects(()=>save(strippedChoices,8),/Please update Fairshare before editing this group/);
+const fractionalYen=structuredClone(withChoices);fractionalYen.expenses.at(-2).amount=1.5;
+await assert.rejects(()=>save(fractionalYen,8),/invalid_expense/);
+const changedChosenDefault=structuredClone(withChoices);changedChosenDefault.currency='JPY';
+await assert.rejects(()=>save(changedChosenDefault,8),/currency_cannot_change/);
+const enlarged=structuredClone(withChoices);enlarged.currencies.push('USD');
+const withMore=await save(enlarged,8);assert.ok(withMore.currencies.includes('USD'));
+const reduced=structuredClone(withMore);reduced.currencies=reduced.currencies.filter(c=>c!=='USD');
+const withLess=await save(reduced,9);assert.deepEqual(withLess.currencies,chosen.currencies);
+// A new default-JPY group can use missing entry currencies as a legacy fallback.
+const yenGroup=structuredClone(group);yenGroup.id='00000000-0000-4000-8000-000000000020';yenGroup.currency='JPY';
+yenGroup.members=yenGroup.members.map(m=>({id:m.id,name:m.name,...(m.id==='b'?{userId:b}:{})}));
+const savedYen=await save(yenGroup,0);assert.equal(savedYen.currency,'JPY');assert.equal(savedYen.expenses[0].amount,101);
+const allSupported={...savedYen,currencies:['HKD','JPY','TWD','USD','EUR','GBP','SGD','AUD','CAD']};
+const savedAll=await save(allSupported,1);assert.deepEqual(savedAll.currencies,allSupported.currencies);
+console.log('PASS: migration, create/update, lost-response replay, null/stale revision rejection, numeric typing, split totals, RLS isolation, direct write denial, invite claim/single use, membership preservation, per-entry currencies, invalid currency rejection, legacy compatibility, old-client denomination-loss rejection, group currency choices, JPY/TWD integer units, effective denomination membership, legacy defaults.');
 await db.close();

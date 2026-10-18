@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {parseMoney,splitAmount,calculateBalances,simplifyDebts,groupCurrencies,expenseTotals} from './money';
+import {parseMoney,splitAmount,calculateBalances,simplifyDebts,groupCurrencies,expenseTotals,amountToInput,formatMoney,availableCurrencies} from './money';
 import {validateGroup} from './validation';
 import type {Group} from './types';
 const group:Group={id:'g',name:'Dinner',emoji:'🍽️',currency:'HKD',revision:0,updatedAt:'2026-10-18T12:00:00Z',members:[{id:'a',name:'A'},{id:'b',name:'B'},{id:'c',name:'C'}],expenses:[{id:'e',description:'Food',amount:10000,payerId:'a',date:'2026-10-18',createdAt:'2026-10-18T12:00:00Z',splits:splitAmount(10000,['a','b','c'],'equal')}],settlements:[]};
@@ -54,4 +54,27 @@ it('splits large debts into valid recordable repayments without losing cents',()
  let current=huge;
  for(const [i,t] of transfers.entries())current=validateGroup({...current,settlements:[...current.settlements,{...t,id:`paid-${i}`,date:'2026-10-18'}]});
  expect(calculateBalances(current)).toEqual({a:0,b:0,c:0});
+});
+
+it('handles whole-yen amounts and preserves two-decimal currencies',()=>{
+ expect(parseMoney('1234','JPY')).toBe(1234);
+ expect(()=>parseMoney('1234.50','JPY')).toThrow('whole-yen');
+ expect(parseMoney('1234.50','TWD')).toBe(123450);
+ expect(amountToInput(1234,'JPY')).toBe('1234');
+ expect(amountToInput(123450,'TWD')).toBe('1234.50');
+ expect(formatMoney(1234,'JPY')).toContain('1,234');
+ expect(formatMoney(1234,'JPY')).not.toContain('.00');
+ expect(splitAmount(parseMoney('100','JPY'),['a','b','c'],'equal').map(s=>s.amount)).toEqual([34,33,33]);
+});
+it('round-trips group currency selections and legacy defaults',()=>{
+ const selected={...group,currencies:['HKD','JPY','TWD','USD']};
+ expect(validateGroup(selected)).toEqual(selected);
+ expect(availableCurrencies(selected)).toEqual(selected.currencies);
+ expect(availableCurrencies(group)).toContain('JPY');
+ expect(validateGroup(group).currencies).toBeUndefined();
+ for(const currencies of [[],['HKD','HKD'],['USD'],['HKD','XYZ'],null,'HKD'])expect(()=>validateGroup({...group,currencies})).toThrow();
+ const yen={...group,currencies:['HKD','JPY'],expenses:[{...group.expenses[0],currency:'JPY',amount:100,splits:splitAmount(100,['a','b','c'],'equal')}]};
+ expect(validateGroup( yen).expenses[0].amount).toBe(100);
+ expect(()=>validateGroup({...yen,currencies:['HKD']})).toThrow();
+ expect(()=>validateGroup({...selected,settlements:[{id:'euro',currency:'EUR',fromId:'a',toId:'b',amount:100,date:'2026-10-18'}]})).toThrow();
 });
